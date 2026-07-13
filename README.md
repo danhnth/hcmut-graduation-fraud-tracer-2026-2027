@@ -1,4 +1,5 @@
-# An Automated Threat Intelligence Framework for Link Analysis and Infrastructure Attribution
+# An Automated Threat Intelligence Framework for Link Analysis and Infrastructure Attribution in Cyber Fraud Investigation
+Tên đề tài: Nghiên cứu, xây dựng hệ thống tự động hóa thu thập tình báo và phân tích liên kết hỗ trợ định vị hạ tầng lừa đảo trực tuyến.
 
 ## 📝  Bản Đề xuất Đồ án Tốt nghiệp / Graduation Project Proposal
 
@@ -14,7 +15,7 @@ Dự án này tập trung xây dựng một hệ thống tự động hóa có k
 ### Mục tiêu (Objectives)
 *   **Nghiên cứu lý thuyết:** Làm rõ các kỹ thuật ẩn danh hạ tầng và các phương pháp "bóc vỏ", phát hiện dấu vết từ tầng mạng (DNS History, Certificate/SAN) đến tầng ứng dụng (Mail Header, API Outbound Traffic).
 *   **Mô hình toán học:** Thiết lập hệ thống luật tự động đánh giá mức độ tin cậy (`Confidence Score`) và bằng chứng xác thực (`Proof Score`) của từng manh mối (Lead), giảm tỷ lệ Dương tính giả (False Positive).
-*   **Sản phẩm kỹ thuật:** Phát triển một nền tảng (Platform) tự động chạy Playbook điều tra khi nhận vào một Indicator ban đầu, trực quan hóa mạng lưới hạ tầng dưới dạng Đồ thị (Graph Visualization).
+*   **Sản phẩm kỹ thuật:** Phát triển một nền tảng tự động chạy Playbook điều tra khi nhận vào một Indicator ban đầu, trực quan hóa mạng lưới hạ tầng dưới dạng Đồ thị (Graph Visualization).
 
 ---
 
