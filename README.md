@@ -1,2 +1,98 @@
-# hcmut-graduation-fraud-tracer-2026-2027
-An Automated Threat Intelligence Framework for Link Analysis and Infrastructure Attribution in Cyber Fraud Investigation.
+# An Automated Threat Intelligence Framework for Link Analysis and Infrastructure Attribution
+
+## 📝  Bản Đề xuất Đồ án Tốt nghiệp / Graduation Project Proposal
+
+## 📌 Tổng quan đề tài (Project Overview)
+
+### Đặt vấn đề (Motivation)
+Tình trạng lừa đảo trực tuyến (Cyber Fraud/Scam) nhắm vào người dùng Việt Nam đang diễn biến cực kỳ phức tạp với quy mô công nghiệp (các trang web cá cược giả mạo, sàn đầu tư ảo, phishing). Để che giấu danh tính, tội phạm mạng thường nâng cao tính ẩn danh hạ tầng (OPSEC) thông qua các dịch vụ Reverse Proxy, CDN, VPN và Bulletproof Hosting. 
+
+Tuy nhiên, do quy trình vận hành vội vàng hoặc quản lý số lượng lớn, kẻ tấn công thường để lại các lỗi cấu hình như: lộ subdomain chưa proxy, rò rỉ IP từ Mail server, cấu hình SSL/TLS Certificate chung, hoặc các dịch vụ phụ (API/Staging) lỏng lẻo. 
+
+Dự án này tập trung xây dựng một hệ thống tự động hóa có khả năng cào dữ liệu trên diện rộng, chuẩn hóa và phân tích liên kết giữa các thực thể mạng để tìm ra sơ hở OPSEC của đối tượng, giảm thiểu thời gian điều tra thủ công.
+
+### Mục tiêu (Objectives)
+*   **Nghiên cứu lý thuyết:** Làm rõ các kỹ thuật ẩn danh hạ tầng và các phương pháp "bóc vỏ", phát hiện dấu vết từ tầng mạng (DNS History, Certificate/SAN) đến tầng ứng dụng (Mail Header, API Outbound Traffic).
+*   **Mô hình toán học:** Thiết lập hệ thống luật tự động đánh giá mức độ tin cậy (`Confidence Score`) và bằng chứng xác thực (`Proof Score`) của từng manh mối (Lead), giảm tỷ lệ Dương tính giả (False Positive).
+*   **Sản phẩm kỹ thuật:** Phát triển một nền tảng (Platform) tự động chạy Playbook điều tra khi nhận vào một Indicator ban đầu, trực quan hóa mạng lưới hạ tầng dưới dạng Đồ thị (Graph Visualization).
+
+---
+
+## 🏗 Kế trúc hệ thống dự kiến (System Architecture)
+
+Hệ thống được thiết kế theo kiến trúc 4 tầng phân tách rõ ràng (4-Tier Architecture):
+
+```mermaid
+graph TD
+    %% Định nghĩa các node input
+    Input([Input: Domain, IP, hoặc CTI JSON Bundle])
+
+    %% Tier 1
+    subgraph Tier 1: Data Ingestion
+        API[FastAPI Gateway]
+        Worker((Celery Workers))
+        ExtAPI[OSINT APIs: Censys, Shodan, VirusTotal]
+        API -->|Task Queue| Worker
+        Worker <-->|Query/Scan| ExtAPI
+    end
+
+    %% Tier 2
+    subgraph Tier 2: Data Integration
+        STIX[STIX 2.1 Normalizer]
+        Neo4j[(Neo4j Graph DB)]
+        PG[(PostgreSQL - Metadata)]
+        Worker -->|Raw Data| STIX
+        STIX -->|Nodes & Edges| Neo4j
+        STIX -->|Logs/Users| PG
+    end
+
+    %% Tier 3
+    subgraph Tier 3: Analytics Engine
+        Path[Pathfinding Algorithms]
+        Score[Rule Engine: Confidence & Proof Scoring]
+        Neo4j <--> Path
+        Neo4j <--> Score
+    end
+
+    %% Tier 4
+    subgraph Tier 4: Presentation UI
+        React[React.js Dashboard]
+        Graph[Cytoscape.js Visualization]
+        Path -->|Shortest Path| React
+        Score -->|Metrics| React
+        React --- Graph
+    end
+
+    %% Kết nối tổng thể
+    Input --> API
+```
+
+1.  **Data Ingestion Tier (Python Scrapers):** Sử dụng Python + Celery thực hiện truy vấn không đồng bộ (Asynchronous) đến các cổng API (Censys, Shodan, VirusTotal, Passive DNS) và chủ động quét các cổng mở (Port Scanning).
+2.  **Data Integration Tier (STIX 2.1 & Neo4j):** Chuẩn hóa toàn bộ thực thể thu thập được về định dạng Tình báo mối đe dọa quốc tế **STIX 2.1**. Dữ liệu được lưu trữ và biểu diễn trên Cơ sở dữ liệu đồ thị (**Graph Database - Neo4j**).
+3.  **Analytics Tier (Rule Engine):** Áp dụng các thuật toán đồ thị (như Shortest Path) để tìm ra tuyến đường ngắn nhất từ IP Proxy bề nổi đến Origin IP tiềm năng.
+4.  **Presentation Tier (React.js & Cytoscape.js):** Dashboard trực quan hiển thị "Cây truy vết", các nút (Nodes), các cạnh (Edges) thể hiện mối quan hệ và tiến độ điều tra.
+
+---
+
+## 🛠 Công nghệ sử dụng (Tech Stack)
+
+*   **Backend:** Python, FastAPI, Celery
+*   **Frontend:** React.js, TailwindCSS, Cytoscape.js / D3.js
+*   **Database:** Neo4j (Graph Database), PostgreSQL (Metadata)
+*   **Standards:** STIX 2.1 (Structured Threat Information Expression)
+*   **DevOps:** Linux (Debian/Kali), Docker, Docker Compose
+
+---
+
+## 🎯 Kế hoạch Demo dự kiến (Demo Plan)
+
+*   **Môi trường triển khai:** Hệ thống được đóng gói hoàn toàn bằng Docker & Docker Compose, cho phép khởi tạo toàn bộ các dịch vụ (Backend, Frontend, Neo4j, Workers) chỉ bằng một lệnh `docker-compose up -d`.
+
+**Kịch bản trình diễn thực tế (Case Study: Truy vết mạng lưới lừa đảo tĩnh):**
+
+*   **Bước 1 - Khởi tạo (Input):** Người dùng (Điều tra viên) tải lên hệ thống một tệp hồ sơ truy vết `CTI Bundle (JSON)` hoặc nhập trực tiếp một domain lừa đảo (ví dụ: `win880.cyou`).
+*   **Bước 2 - Tự động thu thập (Ingestion & Normalization):** Hệ thống kích hoạt các Celery Workers để bóc tách tệp JSON, đồng thời quét bổ sung các chứng chỉ TLS/SSL, lịch sử DNS và cấu hình hạ tầng hiện tại. Toàn bộ dữ liệu thô được chuẩn hóa thành các thực thể STIX 2.1.
+*   **Bước 3 - Trực quan hóa (Graph Visualization):** Giao diện React.js ngay lập tức render ra "Cây truy vết" mạng lưới hạ tầng của mục tiêu. Người dùng có thể zoom, kéo thả và quan sát các cụm (clusters) server dùng chung chứng chỉ hoặc chung mã theo dõi.
+*   **Bước 4 - Phân tích & Gợi ý (Attribution & Playbook):** 
+    * Thuật toán chấm điểm của hệ thống tính toán và làm nổi bật các "Manh mối yếu" (Ví dụ: IP trỏ về Cloudflare San Francisco mang điểm Proof 0/100, Hint vị trí Việt Nam/Campuchia mang điểm Confidence 49/100).
+    * Hệ thống tự động vạch ra "Đường tối ưu", chỉ ra điểm nghẽn hiện tại (kẹt ở lớp proxy) và đề xuất người dùng sử dụng các Connector nội bộ có thẩm quyền để giải ẩn danh nút thắt này.
