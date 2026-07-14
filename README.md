@@ -6,7 +6,7 @@ Tên đề tài: Nghiên cứu, xây dựng hệ thống tự động hóa thu t
 ## Tổng quan đề tài (Project Overview)
 
 ### Đặt vấn đề (Motivation)
-Tình trạng lừa đảo trực tuyến (Cyber Fraud/Scam) nhắm vào người dùng Việt Nam đang diễn biến cực kỳ phức tạp với quy mô công nghiệp (các trang web cá cược giả mạo, sàn đầu tư ảo, phishing). Để che giấu danh tính, tội phạm mạng thường nâng cao tính ẩn danh hạ tầng (OPSEC) thông qua các dịch vụ Reverse Proxy, CDN, VPN và Bulletproof Hosting. 
+Tình trạng lừa đảo trực tuyến nhắm vào người dùng Việt Nam đang diễn biến cực kỳ phức tạp với quy mô công nghiệp (các trang web cá cược giả mạo, sàn đầu tư ảo, phishing). Để che giấu danh tính, tội phạm mạng thường nâng cao tính ẩn danh hạ tầng (OPSEC) thông qua các dịch vụ Reverse Proxy, CDN, VPN và Bulletproof Hosting. 
 
 Tuy nhiên, do quy trình vận hành vội vàng hoặc quản lý số lượng lớn, kẻ tấn công thường để lại các lỗi cấu hình như: lộ subdomain chưa proxy, rò rỉ IP từ Mail server, cấu hình SSL/TLS Certificate chung, hoặc các dịch vụ phụ (API/Staging) lỏng lẻo. 
 
@@ -89,7 +89,7 @@ graph TD
 
 *   **Môi trường triển khai:** Hệ thống được đóng gói hoàn toàn bằng Docker & Docker Compose, cho phép khởi tạo toàn bộ các dịch vụ (Backend, Frontend, Neo4j, Workers) chỉ bằng một lệnh `docker-compose up -d`.
 
-**Kịch bản thực hiện (Truy vết mạng lưới lừa đảo tĩnh):**
+**Kịch bản thực hiện:**
 
 *   **Bước 1 - Khởi tạo (Input):** Người dùng (Điều tra viên) tải lên hệ thống một tệp hồ sơ truy vết `CTI Bundle (JSON)` hoặc nhập trực tiếp một domain lừa đảo (ví dụ: `win880.cyou`).
 *   **Bước 2 - Tự động thu thập (Ingestion & Normalization):** Hệ thống kích hoạt các Celery Workers để bóc tách tệp JSON, đồng thời quét bổ sung các chứng chỉ TLS/SSL, lịch sử DNS và cấu hình hạ tầng hiện tại. Toàn bộ dữ liệu thô được chuẩn hóa thành các thực thể STIX 2.1.
